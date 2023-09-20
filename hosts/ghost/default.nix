@@ -14,7 +14,7 @@
       grub = {
         enable = true;
         grub.device = "/dev/sda";
-      }
+      };
     };
   };
 
