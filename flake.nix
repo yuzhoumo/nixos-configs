@@ -30,12 +30,11 @@
       };
     };
 
-    # available through 'home-manager --flake .#username@hostname'
     # homeConfigurations = {
-    #   "ppanda@esper" = lib.homeManagerConfiguration {
-    #     modules = [ ./home-manager/home.nix ];
+    #   "ppanda@navi" = home-manager.lib.homeManagerConfiguration {
     #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    #     extraSpecialArgs = {inherit inputs outputs;};
+    #     extraSpecialArgs = { inherit inputs outputs; };
+    #     modules = [ ./hosts/navi/home.nix ];
     #   };
     # };
   };

@@ -3,20 +3,22 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+	../../common/all
+  ];
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [ "intel_iommu=igfx_off" "nvidia-drm.modeset=1" ];
+
     loader = {
-      systemd-boot.enable = true; # Use the systemd-boot EFI boot loader.
-      efi.canTouchEfiVariables = false; # Fix read-only issue
+      systemd-boot.enable = true;        # Use systemd-boot EFI boot loader
+      efi.canTouchEfiVariables = false;  # EFI read-only workaround
       grub.device = "/dev/sda";
     };
 
-    kernelParams = [ "intel_iommu=igfx_off" "nvidia-drm.modeset=1" ];
-    supportedFilesystems = [ "ntfs" ]; # Enable NTFS support
+    supportedFilesystems = [ "ntfs" ];   # Enable NTFS support
   };
 
   networking = {
@@ -24,57 +26,42 @@
     networkmanager.enable = true;
   };
 
-  time.timeZone = "America/Los_Angeles";
-
-  programs.dconf.enable = true;
-
-  fonts.fonts = with pkgs; [
-    (nerdfonts.override { fonts = [ "Hack" ]; })
-  ];
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkbOptions in tty.
-  # };
-
   hardware = {
-    opengl.enable = true; # Hardware OpenGL
-    opengl.extraPackages =  [ pkgs.intel-compute-runtime ];
-    nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable; # Nvidia drivers
+    # Hardware OpenGL
+    opengl.enable = true;
+    opengl.extraPackages = [ pkgs.intel-compute-runtime ];
+
+    # Nvidia drivers
+    nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  # Enable the X11 windowing system.
+  # Enable X11 windowing system
   services.xserver = {
     enable = true;
 
-    desktopManager = {
-      xterm.enable = false;
-    };
+    desktopManager.xterm.enable = false;
 
     displayManager = {
       defaultSession = "none+i3";
       sessionCommands = ''
-    	xrandr --output DP-0 --mode 1920x1080 --rate 144
-      '';
+		xrandr --output DP-0 --mode 1920x1080 --rate 144
+      '';  # Connect to primary 144hz monitor
     };
 
     windowManager.i3 = {
       enable = true;
       package = pkgs.i3-gaps;
       extraPackages = with pkgs; [
-        i3lock   # default i3 screen locker
-        rofi     # application launcher
+        i3lock  # Default i3 screen locker
+        rofi    # Application launcher
       ];
     };
 
-    layout = "us"; # Configure X11 keymap
+    # Configure X11 keymap
+    layout = "us";
 
-
-    # NVidia xserver settings
+    # Nvidia Xserver settings
     videoDrivers = [ "nvidia" ];
-
     screenSection = ''
       Option "metamodes" "nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
       Option "AllowIndirectGLXProtocol" "off"
@@ -82,101 +69,43 @@
     '';
   };
 
-  # services.xserver.xkbOptions = {
-  #   "eurosign:e";
-  #   "caps:escape" # map caps to escape.
-  # };
+  # Enable dconf
+  programs.dconf.enable = true;
 
-  # Enable CUPS to print documents.
+  # Enable CUPS to print documents
   services.printing.enable = true;
 
-  # Enable sound.
+  # Enable sound (pulseaudio)
   sound.enable = true;
   hardware.pulseaudio.enable = true;
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  nixpkgs.config.allowUnfree = true; # Allow unfree packages
-  programs.zsh.enable = true;
-  users.defaultUserShell = pkgs.zsh;
-
-  programs.steam.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define user account
   users.users.ppanda = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" ];  # Enable ‘sudo’ for the user.
+	shell = pkgs.zsh;
     packages = with pkgs; [
       bitwarden
       deluge
       discord
+	  feh
       firefox
       gimp
-      kitty
+      gnome.nautilus
+      neovim
       obsidian
-      obs-studio
+      pavucontrol
+      pcmanfm
+      picom
+      (polybar.override { i3Support = true; pulseSupport = true; })
+      shotwell
       signal-desktop
       slack
-      spicetify-cli
       spotify
       tor-browser-bundle-bin
       vlc
-      zoom-us
     ];
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    feh
-    git
-    gnome.nautilus
-    htop
-    killall
-    neovim
-    nodejs
-    pavucontrol
-    pcmanfm
-    (polybar.override { i3Support = true; pulseSupport = true; })
-    picom
-    python3
-    shotwell
-    tmux
-    unzip
-    wget
-  ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
-
+  system.stateVersion = "22.11";
 }
