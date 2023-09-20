@@ -14,7 +14,7 @@
     loader = {
       grub = {
         enable = true;
-        grub.device = "/dev/sda";
+        device = "/dev/sda";
       };
     };
   };
