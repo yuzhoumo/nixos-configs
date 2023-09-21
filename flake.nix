@@ -19,30 +19,23 @@
   } @ inputs: let
     inherit (self) outputs;
     lib = nixpkgs.lib // home-manager.lib;
-    systems = [ "x86_64-linux" "aarch64-linux" ];
-    forEachSystem = f: lib.genAttrs systems (sys: f pkgsFor.${sys});
-    pkgsFor = nixpkgs.legacyPackages;
   in {
     inherit lib;
 
     nixosModules = import ./modules/nixos;
     homeManagerModules = import ./modules/home-manager;
 
-    packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
-    devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
-    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
-
     # available through 'nixos-rebuild --flake .#hostname'
     nixosConfigurations = {
 
 	  # Virtual Machine
-      ghost = nixpkgs.lib.nixosSystem {
+      ghost = lib.nixosSystem {
         modules = [ ./hosts/ghost ];
         specialArgs = { inherit inputs outputs; };
       };
 
       # Desktop
-      navi = nixpkgs.lib.nixosSystem {
+      navi = lib.nixosSystem {
         modules = [ ./hosts/navi ];
         specialArgs = { inherit inputs outputs; };
       };
