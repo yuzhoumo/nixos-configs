@@ -5,7 +5,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-	../../common/all
+    ../../common/all
   ];
 
   boot = {
@@ -14,7 +14,9 @@
     loader = {
       grub = {
         enable = true;
-        device = "/dev/sda";
+        efiSupport = true;
+        efiInstallAsRemovable = true;
+        device = "nodev";
       };
     };
   };
@@ -31,7 +33,7 @@
   #   displayManager = {
   #     defaultSession = "none+i3";
   #     sessionCommands = ''
-		# xrandr --output DP-0 --mode 1920x1080 --rate 144
+  #       xrandr --output DP-0 --mode 1920x1080 --rate 144
   #     '';  # Connect to primary 144hz monitor
   #   };
 
@@ -55,26 +57,16 @@
   users.users.ppanda = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];  # Enable ‘sudo’ for the user.
-	shell = pkgs.zsh;
+    shell = pkgs.zsh;
     packages = with pkgs; [
-      bitwarden
-      deluge
-      discord
-	  feh
+      feh
       firefox
-      gimp
       gnome.nautilus
       neovim
-      obsidian
-      pavucontrol
       pcmanfm
       picom
       (polybar.override { i3Support = true; pulseSupport = true; })
       shotwell
-      signal-desktop
-      slack
-      spotify
-      tor-browser-bundle-bin
       vlc
     ];
   };
