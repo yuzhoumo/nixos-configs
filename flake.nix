@@ -18,9 +18,16 @@
     ...
   } @ inputs: let
     inherit (self) outputs;
+    systems = [ "x86_64-linux" "aarch64-linux" ];
+    forEachSystem = f: lib.genAttrs systems (sys: f pkgsFor.${sys});
+    pkgsFor = nixpkgs.legacyPackages;
   in {
     nixosModules = import ./modules/nixos;
     homeManagerModules = import ./modules/home-manager;
+
+    packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
+    devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
+    formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
 
     # available through 'nixos-rebuild --flake .#hostname'
     nixosConfigurations = {
