@@ -1,88 +1,43 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
+      ../../common/all
     ];
 
-  # Bootloader.
   boot = {
     loader = {
       grub = {
         enable = true;
-	device = "/dev/nvme0n1";
-	useOSProber = true;
+        device = "/dev/nvme0n1";
+        useOSProber = true;
       };
       efi.canTouchEfiVariables = true;
     };
   };
 
-  networking.hostName = "offworld";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "America/Los_Angeles";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
+  networking = {
+    hostName = "offworld";
+    networkmanager.enable = true;
   };
 
-  # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkb.variant = "";
-  };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.ppanda = {
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    shell = pkgs.zsh;
+    packages = with pkgs; [
+      # user packages
+    ];
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    bat
-    git
-    htop
-    neovim
-    tmux
-    tree
-    wget
-  ];
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
   services = {
     openssh = {
       enable = true;
     };
   };
 
-  # Open ports in the firewall.
   networking = {
     firewall = {
       allowedTCPPorts = [ 22 ];
