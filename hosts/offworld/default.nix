@@ -7,21 +7,14 @@
       ../../common/all
     ];
 
-  boot = {
-    loader = {
-      grub = {
-        enable = true;
-        efiSupport = true;
-        devices = [ "nodev" ];
-        useOSProber = true;
-      };
-      efi.canTouchEfiVariables = true;
+  boot.loader = {
+    grub = {
+      devices = [ "nodev" ];
+      efiSupport = true;
+      enable = true;
+      useOSProber = true;
     };
-  };
-
-  networking = {
-    hostName = "offworld";
-    networkmanager.enable = true;
+    efi.canTouchEfiVariables = true;
   };
 
   users.users.ppanda = {
@@ -33,16 +26,18 @@
     ];
   };
 
-  services = {
-    openssh = {
+  networking = {
+    hostName = "offworld";
+    networkmanager.enable = true;
+    firewall = {
+      allowedTCPPorts = [ 22 ];
+      # allowedUDPPorts = [ ... ];
       enable = true;
     };
   };
 
-  networking = {
-    firewall = {
-      allowedTCPPorts = [ 22 ];
-      # allowedUDPPorts = [ ... ];
+  services = {
+    openssh = {
       enable = true;
     };
   };

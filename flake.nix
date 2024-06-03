@@ -46,21 +46,18 @@
         specialArgs = { inherit inputs outputs; };
       };
 
-	    # TODO: Macbook
-      # spinner = nixpkgs.lib.nixosSystem {
-      #   modules = [ ./hosts/spinner ];
-      #   specialArgs = { inherit inputs outputs; };
-      # };
-
     };
 
-    # homeConfigurations = {
-    #   "ppanda@navi" = home-manager.lib.homeManagerConfiguration {
-    #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    #     extraSpecialArgs = { inherit inputs outputs; };
-    #     modules = [ ./hosts/navi/home.nix ];
-    #   };
-    # };
+    homeConfigurations = {
+
+      # Home server: ppanda
+      "ppanda@offworld" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        extraSpecialArgs = { inherit inputs outputs; };
+        modules = [ ./hosts/offworld/home.nix ];
+      };
+
+    };
   };
 }
 
