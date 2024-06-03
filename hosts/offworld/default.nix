@@ -11,7 +11,8 @@
     loader = {
       grub = {
         enable = true;
-        device = "/dev/nvme0n1";
+        efiSupport = true;
+        devices = [ "nodev" ];
         useOSProber = true;
       };
       efi.canTouchEfiVariables = true;
