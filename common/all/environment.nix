@@ -13,21 +13,22 @@
 
     # Default packages installed system-wide
     systemPackages = with pkgs; [
-      gcc
-      glibc
-      clang
-      htop
-      git
       bat
-      kitty
+      clang
+      gcc
+      git
+      glibc
+      htop
       killall
+      kitty
       nano
       neovim
-      zip
+      python3
+      tmux
+      tree
       unzip
       wget
-      tmux
-      python3
+      zip
     ];
   };
 }
